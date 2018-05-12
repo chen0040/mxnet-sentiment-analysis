@@ -18,8 +18,8 @@ def main():
     model_dir_path = os.path.join(os.path.dirname(__file__), 'models')
     data_file_path = patch_path('data/umich-sentiment-train.txt')
 
-    from mxnet_nlp.library.sentiment_analysis.lstm import SentimentAnalyserWithSoftMaxLSTM
-    from mxnet_nlp.library.utility.simple_data_loader import load_text_label_pairs
+    from mxnet_sentiment.library.lstm import SentimentAnalyserWithSoftMaxLSTM
+    from mxnet_sentiment.utility.simple_data_loader import load_text_label_pairs
 
     text_label_pairs = load_text_label_pairs(data_file_path)
 

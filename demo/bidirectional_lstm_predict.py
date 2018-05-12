@@ -15,21 +15,22 @@ def main():
 
     mx.random.seed(1)
 
-    output_dir_path = os.path.join(os.path.dirname(__file__), 'models')
+    model_dir_path = os.path.join(os.path.dirname(__file__), 'models')
     data_file_path = patch_path('data/umich-sentiment-train.txt')
 
-    from mxnet_sentiment.library.lstm import SentimentAnalyserWithSoftMaxLSTM
+    from mxnet_sentiment.library.lstm import SentimentAnalyserWithSoftMaxBidrectionalLSTM
     from mxnet_sentiment.utility.simple_data_loader import load_text_label_pairs
-    from mxnet_sentiment.utility.text_utils import fit_text
 
-    text_data_model = fit_text(data_file_path)
     text_label_pairs = load_text_label_pairs(data_file_path)
 
     train_data, validation_data = train_test_split(text_label_pairs, test_size=0.3, random_state=42)
 
-    rnn = SentimentAnalyserWithSoftMaxLSTM(model_ctx=mx.gpu(0), data_ctx=mx.gpu(0))
-    history = rnn.fit(text_data_model, text_label_pairs=train_data, model_dir_path=output_dir_path,
-                      checkpoint_interval=10, batch_size=64, epochs=20, test_text_label_pairs=validation_data)
+    rnn = SentimentAnalyserWithSoftMaxBidrectionalLSTM(model_ctx=mx.gpu(0), data_ctx=mx.gpu(0))
+    rnn.load_model(model_dir_path)
+
+    for text, label in validation_data:
+        predicted_label = rnn.predict_class(text)
+        print('predicted: ', predicted_label, 'actual: ', label)
 
 
 if __name__ == '__main__':
