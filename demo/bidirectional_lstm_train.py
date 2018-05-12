@@ -2,6 +2,7 @@ from __future__ import print_function
 import mxnet as mx
 import os
 import sys
+import logging
 
 from sklearn.model_selection import train_test_split
 
@@ -17,6 +18,8 @@ def main():
 
     output_dir_path = os.path.join(os.path.dirname(__file__), 'models')
     data_file_path = patch_path('data/umich-sentiment-train.txt')
+
+    logging.basicConfig(level=logging.DEBUG)
 
     from mxnet_sentiment.library.lstm import SentimentAnalyserWithSoftMaxBidrectionalLSTM
     from mxnet_sentiment.utility.simple_data_loader import load_text_label_pairs

@@ -6,6 +6,7 @@ import numpy as np
 from mxnet_sentiment.utility.sequences import pad_sequences
 from mxnet_sentiment.utility.tokenizer_utils import word_tokenize
 from random import shuffle
+import logging
 
 
 class MultiClassTextClassifier(ABC):
@@ -51,7 +52,9 @@ class MultiClassTextClassifier(ABC):
         pass
 
     def checkpoint(self, model_dir_path):
-        self.model.save_params(self.get_params_file_path(model_dir_path))
+        file_path = self.get_params_file_path(model_dir_path)
+        logging.debug('check point to %s', file_path)
+        self.model.save_params(file_path)
 
     def evaluate_accuracy(self, text_label_pairs, batch_size=64):
         X, Y = self.encode_text(text_label_pairs, batch_size)
@@ -62,8 +65,9 @@ class MultiClassTextClassifier(ABC):
         for i, (data, label) in enumerate(zip(X, Y)):
             data = data.as_in_context(self.model_ctx)
             label = label.as_in_context(self.model_ctx)
-            predictions = self.model(data)
-            loss = softmax_loss(predictions, label)
+            output = self.model(data)
+            predictions = nd.argmax(output, axis=1)
+            loss = softmax_loss(output, label)
             metric.update(preds=predictions, labels=label)
             loss_avg = loss_avg * i / (i + 1) + nd.mean(loss).asscalar() / (i + 1)
         return metric.get()[1], loss_avg
