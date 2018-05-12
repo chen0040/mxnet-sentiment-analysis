@@ -44,7 +44,7 @@ class MultiClassTextClassifier(ABC):
         self.labels = self.config['labels']
 
         self.model = self.create_model()
-        self.model.load_params(self.get_params_file_path(model_dir_path))
+        self.model.load_params(self.get_params_file_path(model_dir_path), ctx=self.model_ctx)
 
     @abstractmethod
     def create_model(self) -> gluon.nn.Sequential:
@@ -173,7 +173,7 @@ class MultiClassTextClassifier(ABC):
         tokens = [w.lower() for w in word_tokenize(sentence)]
         wid = [self.word2idx[token] if token in self.word2idx else 1 for token in tokens]
         xs.append(wid)
-        x = pad_sequences(xs, self.sequence_length)
+        x = pad_sequences(xs, self.sequence_length).as_in_context(self.model_ctx)
         output = self.model(x)
         return output.asnumpy()[0]
 
