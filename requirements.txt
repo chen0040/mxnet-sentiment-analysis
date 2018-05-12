@@ -1,0 +1,6 @@
+numpy
+mxnet-cu90
+matplotlib
+lru-dict
+scipy
+scikit-learn
